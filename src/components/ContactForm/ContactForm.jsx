@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from '../../redux/actions';
+// import { getContacts} from 
 import style from "../ContactForm/ContactForm.module.css";
 import Button from "../Button";
 
@@ -41,7 +43,7 @@ function ContactForm() {
     };
 
     dispatch(addContact(contactData));
-    
+
     reset();
   }
 
