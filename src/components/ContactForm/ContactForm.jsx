@@ -1,32 +1,57 @@
-import React, { Component } from "react";
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import style from "../ContactForm/ContactForm.module.css";
-import PropTypes from "prop-types";
 import Button from "../Button";
 
-class ContactForm extends Component {
-  state = {
-    name: "",
-    number: "",
-  };
+function ContactForm() {
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
 
-  onInputChange = (e) => {
-    this.setState({ [e.target.name]: e.target.value });
-  };
+  const contacts = useSelector(getContacts);
+  const dispatch = useDispatch();
 
-  onFormSubmit = (e) => {
+  const onInputChange = (e) => {
+    if (e.target.name === 'name') setName(e.target.value);
+    if (e.target.name === 'number') setNumber(e.target.value);
+  }
+  const onFormSubmit = (e) => {
     e.preventDefault();
-    this.props.addContact(this.state.name, this.state.number);
-    this.reset();
+
+    const dublicateContactName = contacts.find(
+      (contact) => contact.number === number
+    );
+    const dublicateContactNumber = contacts.find(
+      (contact) => contact.number === number
+    );
+    
+    if (dublicateContactName) {
+      alert(`${name} is in contacts!`);
+      reset();
+      return;
+    }
+    if (dublicateContactNumber) {
+      alert(`${number} is in contacts!`);
+      reset();
+      return;
+    }
+
+    const contactData = {
+      name,
+      number,
+    };
+
+    dispatch(addContact(contactData));
+    
+    reset();
+  }
+
+  const reset = () => {
+    setName('');
+    setNumber('');
   };
 
-  reset = () => {
-    this.setState({ name: "", number: "" });
-  };
-
-  render() {
-    const { name, number } = this.state;
     return (
-      <form className={style.contactForm} onSubmit={this.onFormSubmit}>
+      <form className={style.contactForm} onSubmit={onFormSubmit}>
         <label>
           <span className={style.titleStyle}>Name</span>
           <input
@@ -36,7 +61,7 @@ class ContactForm extends Component {
             title="Имя может состоять только из букв, апострофа, тире и пробелов. Например Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan и т. п."
             required
             value={name}
-            onChange={this.onInputChange}
+            onChange={onInputChange}
           />
         </label>
         <label>
@@ -48,16 +73,12 @@ class ContactForm extends Component {
             title="Номер телефона должен состоять цифр и может содержать пробелы, тире, круглые скобки и может начинаться с +"
             required
             value={number}
-            onChange={this.onInputChange}
+            onChange={onInputChange}
           />
         </label>
         <Button type="submit">Add contact</Button>
       </form>
     );
   }
-}
-ContactForm.propTypes = {
-  addContact: PropTypes.func.isRequired,
-};
 
 export default ContactForm;
