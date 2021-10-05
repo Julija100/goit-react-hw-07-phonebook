@@ -1,15 +1,28 @@
-import PropTypes from 'prop-types'
+import { useSelector, useDispatch } from 'react-redux';
+import { useEffect } from "react";
 import addClassNames from '../../utils/addClassNames';
 import style from '../ContactsList/ContactsList.module.css'
+import { deleteContact, fetchContacts } from '../../redux/contacts/contactsOperations'
 import IconButton, {
   deleteContactBtnClassNames,
 } from "../IconButton/IconButton";
 import { ReactComponent as IconCross } from '../../image/cross.svg';
+import { getFilteredContacts } from '../../redux/contacts/contactsSelectors';
 
 
-const ContactsList = ({ contacts, deleteContactsButton }) => {
+
+const ContactsList = () => {
   const contactsListNames = addClassNames('list');
   const contactNameNames = addClassNames('link');
+
+  const contacts = useSelector(getFilteredContacts);
+  const dispatch = useDispatch();
+  const onDeleteContactButtonClick = (id) => dispatch(deleteContact(id));
+
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
+
   return (
     <ul className={contactsListNames}>
       {contacts.map(({ id, name, number }) => (
@@ -24,7 +37,7 @@ const ContactsList = ({ contacts, deleteContactsButton }) => {
             ariaLabel="Delete contact button"
             width="40"
             height="40"
-            onClick={() => deleteContactsButton(id)}
+            onClick={() => onDeleteContactButtonClick(id)}
             className={deleteContactBtnClassNames}
           >
             <IconCross width="20" height="20" />
@@ -42,17 +55,6 @@ const ContactsList = ({ contacts, deleteContactsButton }) => {
       ))}
     </ul>
   );
-};
-
-ContactsList.propTypes = {
-  contacts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      number: PropTypes.string.isRequired,
-    })
-  ),
-  deleteContactsButton: PropTypes.func.isRequired,
 };
 
 export default ContactsList;
